@@ -46,7 +46,7 @@ RUN apt-get update && \
     npm config set registry https://registry.npmmirror.com && \
     npm install -g openclaw@2026.4.14 opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird agent-browser && \
     # 安装 agent-browser 依赖
-    agent-browser install --with-deps && \
+    agent-browser install && \
     # 安装 bun、uv 和 qmd
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
