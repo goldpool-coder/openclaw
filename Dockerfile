@@ -56,9 +56,8 @@ RUN mkdir -p .linuxbrew/Homebrew && \
     mkdir -p .linuxbrew/bin && \
     ln -s .linuxbrew/Homebrew/bin/brew .linuxbrew/bin/brew && \
     chmod -R g+rwX .linuxbrew && \
-    export PATH="/home/node/.linuxbrew/bin:$PATH" && \
-    brew install gh && \
-    brew cleanup --prune=all
+    /home/node/.linuxbrew/bin/brew install gh && \
+    /home/node/.linuxbrew/bin/brew cleanup --prune=all
 
 # ==============================================================================
 # 阶段 2: final - 构建最终的、轻量的生产镜像
