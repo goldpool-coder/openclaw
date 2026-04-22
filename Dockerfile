@@ -1,6 +1,5 @@
 # ==============================================================================
 # 阶段 1: builder - 构建一个包含所有基础依赖的稳定环境
-# 此阶段包含了所有耗时且不常变的安装步骤，以实现最大化缓存。
 # ==============================================================================
 FROM node:24-slim AS builder
 
@@ -17,14 +16,12 @@ ENV BUN_INSTALL="/usr/local" \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     bash ca-certificates chromium curl docker.io build-essential ffmpeg \
-    fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq \
+    fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq vim nano\
     locales openssh-client procps socat tini iputils-ping dnsutils unzip && \
-    # -- 配置系统环境 --
     sed -i 's/^# *en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
-    # -- 安装最新的全局 Node.js 工具 (严格按照原始文件内容 ) --
     npm config set registry https://registry.npmmirror.com && \
     npm install -g \
         opencode-ai \
@@ -35,13 +32,11 @@ RUN apt-get update && \
         @steipete/bird \
         agent-browser \
         @tobilu/qmd && \
-    # -- 安装其他最新工具 --
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
     python3 -m pip install --no-cache-dir websockify && \
     npx playwright install chromium --with-deps && \
-    # -- 清理 apt 缓存 --
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -54,7 +49,7 @@ ENV HOME=/home/node
 RUN mkdir -p .linuxbrew/Homebrew && \
     git clone --depth 1 https://github.com/Homebrew/brew .linuxbrew/Homebrew && \
     mkdir -p .linuxbrew/bin && \
-    ln -s .linuxbrew/Homebrew/bin/brew .linuxbrew/bin/brew && \
+    ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chmod -R g+rwX .linuxbrew
 
 # ==============================================================================
@@ -62,6 +57,8 @@ RUN mkdir -p .linuxbrew/Homebrew && \
 # ==============================================================================
 FROM node:24-slim
 
+ARG NAPCAT_VERSION=v4.17.25
+ARG APP_VERSION=2026.4.20
 ARG CLAWHUB_TOKEN
 
 # -- 从 builder 阶段拷贝所有预装好的环境和工具 --
@@ -90,23 +87,19 @@ ENV BUN_INSTALL="/usr/local" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     HOMEBREW_NO_INSTALL_CLEANUP=1
 
-# -- 关键步骤：拷贝 version.txt 并安装指定版本的 openclaw --
-COPY version.txt /tmp/version.txt
-RUN APP_VERSION=$(cat /tmp/version.txt ) && \
-    npm config set registry https://registry.npmmirror.com && \
+# -- 使用 ARG 安装 openclaw --
+RUN npm config set registry https://registry.npmmirror.com && \
     npm install -g openclaw@${APP_VERSION} && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
-# -- 作为 node 用户安装依赖于 openclaw 的插件 --
+# -- 作为 node 用户安装插件 --
 USER node
 WORKDIR /home/node
-COPY --chown=node:node version.txt .
-RUN APP_VERSION=$(cat ./version.txt ) && \
-    mkdir -p /home/node/.openclaw/workspace && \
+RUN mkdir -p /home/node/.openclaw/workspace && \
     if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi && \
     cd /home/node/.openclaw && \
     mkdir extensions && cd extensions && \
-    git clone --depth 1 -b v4.17.25 https://github.com/Daiyimo/openclaw-napcat.git napcat && \
+    git clone --depth 1 -b "${NAPCAT_VERSION}" https://github.com/Daiyimo/openclaw-napcat.git napcat && \
     cd napcat && npm install --production && cd .. && \
     timeout 300 openclaw plugins install --dangerously-force-unsafe-install -l ./napcat || true && \
     timeout 300 openclaw plugins install --dangerously-force-unsafe-install @soimy/dingtalk || true && \
@@ -118,7 +111,6 @@ RUN APP_VERSION=$(cat ./version.txt ) && \
     mv .openclaw/extensions .openclaw-seed/ && \
     find .openclaw-seed/extensions -name ".git" -type d -exec rm -rf {} + && \
     printf '%s\n' "${APP_VERSION}" > .openclaw-seed/extensions/.seed-version && \
-    rm -f ./version.txt && \
     rm -rf /tmp/* .npm .cache
 
 # -- 最终配置和入口点 --
