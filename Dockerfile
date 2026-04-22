@@ -30,7 +30,7 @@ RUN apt-get update && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
     # 安装除 openclaw 之外的全局包
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird && \
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
