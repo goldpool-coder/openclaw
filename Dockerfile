@@ -1,4 +1,4 @@
-# OpenClaw Docker 镜像 (整合全部优化需求)
+# OpenClaw Docker 镜像 
 
 # --- 1. 定义所有构建时参数 ---
 ARG APP_VERSION=2026.4.20
@@ -18,7 +18,7 @@ ENV BUN_INSTALL="/usr/local" \
     PATH="/usr/local/bin:$PATH" \
     DEBIAN_FRONTEND=noninteractive
 
-# --- 2. 安装除 openclaw 之外的所有系统依赖和全局工具 (第一层缓存) ---
+# --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     bash ca-certificates chromium curl docker.io build-essential ffmpeg \
@@ -29,25 +29,21 @@ RUN apt-get update && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    # 安装除 openclaw 之外的全局包
     npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
     /usr/local/bin/python3 -m pip install --no-cache-dir websockify && \
     npx playwright install chromium --with-deps && \
-    # --- 以 root 身份 ，预编译 qmd 的依赖 ---
-    # 进入 node-llama-cpp 目录并执行 rebuild，忽略可能的脚本错误
-    (cd /usr/local/lib/node_modules/@tobilu/qmd/node_modules/node-llama-cpp && npm run rebuild) || true && \
+    (cd /usr/local/lib/node_modules/@tobilu/qmd/node_modules/node-llama-cpp && npm run rebuild ) || true && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
 
-# --- 3. 单独安装 openclaw (第二层缓存 ，实现快速更新) ---
-# ARG 需要在 FROM 之后重新声明才能使用
+# --- 3. 【只】安装 openclaw (频繁变动的应用层，用于缓存优化) ---
 ARG APP_VERSION
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install -g openclaw@${APP_VERSION} @tobilu/qmd && \
+    npm install -g openclaw@${APP_VERSION} && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
 # --- 4. 准备 node 用户环境并安装插件 ---
@@ -73,7 +69,6 @@ ARG NAPCAT_VERSION
 ARG CLAWHUB_TOKEN
 RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi && \
   cd /home/node/.openclaw/extensions && \
-  # 使用 ARG 变量克隆指定版本的 napcat
   git clone --depth 1 -b "${NAPCAT_VERSION}" https://github.com/Daiyimo/openclaw-napcat.git napcat && \
   cd napcat && \
   npm install --production && \
@@ -85,14 +80,11 @@ RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi 
   mkdir -p /home/node/.openclaw /home/node/.openclaw-seed && \
   find /home/node/.openclaw/extensions -name ".git" -type d -exec rm -rf {} + && \
   mv /home/node/.openclaw/extensions /home/node/.openclaw-seed/ && \
-  # 使用 ARG 变量写入版本文件
   printf '%s\n' "${APP_VERSION}" > /home/node/.openclaw-seed/extensions/.seed-version && \
   rm -rf /tmp/* /home/node/.npm /home/node/.cache
   
 # --- 5. 最终配置 ---
 USER root
-
-# 复制初始化脚本
 COPY ./init.sh /usr/local/bin/init.sh
 RUN sed -i 's/\r$//' /usr/local/bin/init.sh && \
     chmod +x /usr/local/bin/init.sh
