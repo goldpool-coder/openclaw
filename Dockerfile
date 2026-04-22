@@ -87,15 +87,17 @@ ENV BUN_INSTALL="/usr/local" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     HOMEBREW_NO_INSTALL_CLEANUP=1
 
-# -- 使用 ARG 安装 openclaw --
-RUN npm config set registry https://registry.npmmirror.com && \
-    npm install -g openclaw@${APP_VERSION} && \
-    rm -rf /tmp/* /root/.npm /root/.cache
-
-# -- 作为 node 用户安装插件 --
+# --- 釜底抽薪的最终修正 ---
+# 切换到 node 用户 ，然后在一个 RUN 指令中完成所有相关操作
 USER node
 WORKDIR /home/node
-RUN mkdir -p /home/node/.openclaw/workspace && \
+RUN \
+    # 步骤 1: 作为 node 用户，安装 openclaw
+    npm config set registry https://registry.npmmirror.com && \
+    npm install -g openclaw@${APP_VERSION} && \
+    \
+    # 步骤 2: 立即开始安装插件 ，此时环境绝对一致
+    mkdir -p /home/node/.openclaw/workspace && \
     if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi && \
     cd /home/node/.openclaw && \
     mkdir extensions && cd extensions && \
@@ -105,7 +107,8 @@ RUN mkdir -p /home/node/.openclaw/workspace && \
     timeout 300 openclaw plugins install --dangerously-force-unsafe-install @soimy/dingtalk || true && \
     timeout 300 openclaw plugins install --dangerously-force-unsafe-install @tencent-connect/openclaw-qqbot || true && \
     timeout 300 openclaw plugins install --dangerously-force-unsafe-install @sunnoy/wecom || true && \
-    # -- 创建种子目录并写入版本信息 --
+    \
+    # 步骤 3: 创建种子目录并清理
     cd /home/node && \
     mkdir -p .openclaw-seed && \
     mv .openclaw/extensions .openclaw-seed/ && \
