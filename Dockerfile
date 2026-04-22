@@ -55,9 +55,7 @@ RUN mkdir -p .linuxbrew/Homebrew && \
     git clone --depth 1 https://github.com/Homebrew/brew .linuxbrew/Homebrew && \
     mkdir -p .linuxbrew/bin && \
     ln -s .linuxbrew/Homebrew/bin/brew .linuxbrew/bin/brew && \
-    chmod -R g+rwX .linuxbrew && \
-    /home/node/.linuxbrew/bin/brew install gh && \
-    /home/node/.linuxbrew/bin/brew cleanup --prune=all
+    chmod -R g+rwX .linuxbrew
 
 # ==============================================================================
 # 阶段 2: final - 构建最终的、轻量的生产镜像
