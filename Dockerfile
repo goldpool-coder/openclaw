@@ -30,14 +30,15 @@ RUN apt-get update && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
     # 安装除 openclaw 之外的全局包
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk && \
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
     /usr/local/bin/python3 -m pip install --no-cache-dir websockify && \
-    # 安装最新版本的 qmd
-    npm install -g @tobilu/qmd && \
     npx playwright install chromium --with-deps && \
+    # --- 以 root 身份 ，预编译 qmd 的依赖 ---
+    # 进入 node-llama-cpp 目录并执行 rebuild，忽略可能的脚本错误
+    (cd /usr/local/lib/node_modules/@tobilu/qmd/node_modules/node-llama-cpp && npm run rebuild) || true && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
@@ -46,7 +47,7 @@ RUN apt-get update && \
 # ARG 需要在 FROM 之后重新声明才能使用
 ARG APP_VERSION
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install -g openclaw@${APP_VERSION} && \
+    npm install -g openclaw@${APP_VERSION} @tobilu/qmd && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
 # --- 4. 准备 node 用户环境并安装插件 ---
