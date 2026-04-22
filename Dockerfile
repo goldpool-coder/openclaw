@@ -51,8 +51,9 @@ RUN npm config set registry https://registry.npmmirror.com && \
 
 # --- 4. 准备 node 用户环境并安装插件 ---
 RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
-    chown -R node:node /home/node
-
+    mkdir -p /var/tmp/openclaw-compile-cache && \
+    chown -R node:node /home/node /var/tmp/openclaw-compile-cache
+    
 USER node
 ENV HOME=/home/node
 WORKDIR /home/node
@@ -105,6 +106,8 @@ ENV HOME=/home/node \
     NODE_ENV=production \
     PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
+    NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
+    OPENCLAW_NO_RESPAWN=1 \
     HOMEBREW_NO_AUTO_UPDATE=1 \
     HOMEBREW_NO_INSTALL_CLEANUP=1
 
