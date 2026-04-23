@@ -102,8 +102,8 @@ ENV HOME=/home/node \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
-    QMD_LLAMA_GPU = false \
-    NODE_LLAMA_CPP_GPU = false \
+    QMD_LLAMA_GPU=false \
+    NODE_LLAMA_CPP_GPU=false \
     HOMEBREW_NO_AUTO_UPDATE=1 \
     HOMEBREW_NO_INSTALL_CLEANUP=1
 
