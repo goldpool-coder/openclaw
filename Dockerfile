@@ -49,7 +49,8 @@ RUN npm config set registry https://registry.npmmirror.com && \
 # --- 4. 准备 node 用户环境并安装插件 ---
 RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     mkdir -p /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 && \
-    chown -R node:node /home/node /var/tmp/openclaw-compile-cache /var/tmp/openclaw-compile-cache /tmp/openclaw-1000
+    chown -R node:node /home/node /var/tmp/openclaw-compile-cache /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 && \
+    chmod 700 /tmp/openclaw-1000
     
 USER node
 ENV HOME=/home/node
