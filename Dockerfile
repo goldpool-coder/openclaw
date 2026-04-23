@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.4.20
+ARG APP_VERSION=2026.4.21
 ARG NAPCAT_VERSION=v4.17.25
 
 # 基础镜像
