@@ -35,8 +35,6 @@ RUN apt-get update && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
     /usr/local/bin/python3 -m pip install --no-cache-dir websockify && \
     npx playwright install chromium --with-deps && \
-    # 如果不带GPU，基于源码安装CPU支持的node-llama-cpp版本
-    NODE_LLAMA_CPP_SKIP_DOWNLOAD=true npm install -g node-llama-cpp && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
@@ -104,6 +102,8 @@ ENV HOME=/home/node \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
+    QMD_LLAMA_GPU = false \
+    NODE_LLAMA_CPP_GPU = false \
     HOMEBREW_NO_AUTO_UPDATE=1 \
     HOMEBREW_NO_INSTALL_CLEANUP=1
 
