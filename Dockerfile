@@ -35,7 +35,6 @@ RUN apt-get update && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
     /usr/local/bin/python3 -m pip install --no-cache-dir websockify && \
     npx playwright install chromium --with-deps && \
-    (cd /usr/local/lib/node_modules/@tobilu/qmd/node_modules/node-llama-cpp && npm run rebuild ) || true && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
@@ -49,6 +48,7 @@ RUN npm config set registry https://registry.npmmirror.com && \
 # --- 4. 准备 node 用户环境并安装插件 ---
 RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     mkdir -p /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 && \
+    chown -R node:node /usr/local/lib/node_modules \
     chown -R node:node /home/node /var/tmp/openclaw-compile-cache /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 && \
     chmod 700 /tmp/openclaw-1000
     
