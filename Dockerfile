@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.4.21
+ARG APP_VERSION=2026.4.22
 ARG NAPCAT_VERSION=v4.17.25
 
 # 基础镜像
@@ -16,6 +16,7 @@ WORKDIR /app
 # 设置环境变量
 ENV BUN_INSTALL="/usr/local" \
     PATH="/usr/local/bin:$PATH" \
+    NODE_LLAMA_CPP_GPU=false \
     DEBIAN_FRONTEND=noninteractive
 
 # --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
@@ -29,7 +30,7 @@ RUN apt-get update && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk && \
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
