@@ -24,6 +24,7 @@
 | `DOCKERHUB_USERNAME` | Docker Hub 用户名 | `myusername` |
 | `DOCKERHUB_TOKEN` | Docker Hub 访问令牌 | 在 Docker Hub 生成 |
 | `DOCKERHUB_REPO` | Docker Hub 仓库名称 | `openclaw` |
+| `CLAWHUB_TOKEN` | Claw Hub 访问令牌 | 在 Claw Hub 生成 |
 
 **注意**：`GITHUB_TOKEN` 是自动提供的，无需手动配置。
 
