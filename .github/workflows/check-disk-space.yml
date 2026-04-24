@@ -1,0 +1,68 @@
+# ==================================================================================
+# GitHub Actions Workflow: Check Runner Disk Space
+#
+# 文件路径: .github/workflows/check-disk-space.yml
+#
+# 功能:
+# 1. 检出代码。
+# 2. 打印详细的磁盘使用报告，帮助诊断空间问题。
+#
+# ==================================================================================
+
+name: Check Runner Disk Space
+
+# 触发条件：
+# 1. 当有代码推送到 main 分支时运行。
+# 2. 允许在 GitHub Actions 页面手动触发此 workflow。
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  check-space:
+    # 使用 GitHub 提供的最新版 Ubuntu Runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # 步骤 1: 检出您的代码，以便 workflow 可以运行
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 步骤 2: 打印磁盘空间报告
+      - name: Print disk space report
+        run: |
+          echo "=========================================================="
+          echo "==> 1. Overall Disk Usage (df -h)"
+          echo "=========================================================="
+          # 'df -h' 显示每个分区的总空间、已用空间和可用空间。
+          # 这是最重要的命令，关注 '/' 根分区的 'Avail' (可用) 空间。
+          df -h
+
+          echo ""
+          echo "=========================================================="
+          echo "==> 2. Top 10 Largest Directories in /usr/share"
+          echo "=========================================================="
+          # '/usr/share' 包含很多预装的软件和库，比如 dotnet, swift。
+          sudo du -sh /usr/share/* | sort -rh | head -n 10
+
+          echo ""
+          echo "=========================================================="
+          echo "==> 3. Top 10 Largest Directories in /opt"
+          echo "=========================================================="
+          # '/opt' 目录通常包含第三方工具，比如 ghc (Haskell), CodeQL。
+          sudo du -sh /opt/* | sort -rh | head -n 10
+          
+          echo ""
+          echo "=========================================================="
+          echo "==> 4. Android SDK Directory Size"
+          echo "=========================================================="
+          # Android SDK 是一个占用空间大户。
+          sudo du -sh /usr/local/lib/android
+          
+          echo ""
+          echo "=========================================================="
+          echo "==> 5. Docker Directory Size"
+          echo "=========================================================="
+          # 在构建前，Docker 目录可能已经包含了一些系统默认的镜像。
+          sudo du -sh /var/lib/docker
