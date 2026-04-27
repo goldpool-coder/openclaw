@@ -2024,8 +2024,10 @@ def apply_feishu_plugin_switch(ctx):
             print('🚫 已禁用插件开关: 飞书官方插件 openclaw-lark')
             print('✅ 已自动启用旧版渠道: 飞书')
         return
-
-    ctx.entries[official_plugin_id] = {'enabled': False}
+    
+    # 屏蔽下面这行代码，否则每次启动都自动添加 openclaw-lark，然后报错
+    # ctx.entries[official_plugin_id] = {'enabled': False}
+    
     ctx.entries['feishu'] = {'enabled': has_credentials}
     if has_credentials:
         print('ℹ️ 飞书官方插件开关未配置，默认启用旧版飞书渠道并禁用官方插件')
