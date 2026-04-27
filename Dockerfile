@@ -30,7 +30,7 @@ RUN apt-get update && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd && \
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd gog && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
