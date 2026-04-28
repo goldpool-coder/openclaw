@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.4.24
+ARG APP_VERSION=2026.4.25
 ARG NAPCAT_VERSION=v4.17.25
 
 # 基础镜像
@@ -30,7 +30,7 @@ RUN apt-get update && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd gog && \
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
@@ -63,7 +63,9 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
-    chmod -R g+rwX /home/node/.linuxbrew
+    chmod -R g+rwX /home/node/.linuxbrew && \
+    # 安装 gog
+    brew install gogcli
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
