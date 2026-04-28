@@ -58,14 +58,17 @@ ENV HOME=/home/node
 WORKDIR /home/node
 
 # 安装 linuxbrew
-RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
+RUN apt-get update && apt-get install -y git && \
+    mkdir -p /home/node/.linuxbrew/Homebrew && \
     git clone --depth 1 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
-    # 安装 gog
-    brew install gogcli
+    # 安装 gog 
+    # 将 brew install gogcli 改为了 brew install steipete/tap/gogcli ，并使用了绝对路径 /home/node/.linuxbrew/bin/brew，这更稳妥，
+    # 因为此时 brew 的路径可能还没加入到 PATH 环境变量中。
+    /home/node/.linuxbrew/bin/brew install steipete/tap/gogcli
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
