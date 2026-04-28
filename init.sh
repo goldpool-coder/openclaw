@@ -2010,12 +2010,12 @@ def apply_feishu_plugin_switch(ctx):
     legacy_plugin_id = 'feishu-openclaw-plugin'
     if legacy_plugin_id in ctx.entries and official_plugin_id not in ctx.entries:
         legacy_entry = ctx.entries.get(legacy_plugin_id)
-        if isinstance(legacy_entry, dict):
-            ctx.entries[official_plugin_id] = deepcopy(legacy_entry)
-        del ctx.entries[legacy_plugin_id]
-        print('✅ 已将飞书官方插件 ID 从 feishu-openclaw-plugin 迁移为 openclaw-lark')
+        # if isinstance(legacy_entry, dict):
+        #     ctx.entries[official_plugin_id] = deepcopy(legacy_entry)
+        # del ctx.entries[legacy_plugin_id]
+        # print('✅ 已将飞书官方插件 ID 从 feishu-openclaw-plugin 迁移为 openclaw-lark')
     if ctx.feishu_plugin_explicit:
-        ctx.entries[official_plugin_id] = {'enabled': ctx.feishu_plugin_enabled}
+        # ctx.entries[official_plugin_id] = {'enabled': ctx.feishu_plugin_enabled}
         ctx.entries['feishu'] = {'enabled': not ctx.feishu_plugin_enabled}
         if ctx.feishu_plugin_enabled:
             print('✅ 已启用插件开关: 飞书官方插件 openclaw-lark')
