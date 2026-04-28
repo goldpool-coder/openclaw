@@ -66,6 +66,8 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
+    # 先 eval 初始化 Homebrew 环境 ，再执行 install
+    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
     # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
     brew install steipete/tap/gogcli
 
