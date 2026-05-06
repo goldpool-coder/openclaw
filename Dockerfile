@@ -69,7 +69,9 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     # 先 eval 初始化 Homebrew 环境 ，再执行 install
     eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
     # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
-    brew install steipete/tap/gogcli
+    brew install steipete/tap/gogcli && \
+    brew install gh && \
+    brew cleanup --prune=all
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
