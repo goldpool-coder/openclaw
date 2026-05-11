@@ -1450,9 +1450,9 @@ def sync_models(ctx):
     if primary_provider:
         synced_provider_names.append(primary_provider)
 
-    # 2. 同步额外提供商 (2-10)
+    # 2. 同步额外提供商 (2-9)
     enabled_extra_providers = []
-    for index in range(2, 11):
+    for index in range(2, 10):
         prefix = f'MODEL{index}'
         raw_name = str(ctx.env.get(f'{prefix}_NAME') or '').strip()
         p_name = raw_name or f'model{index}'
@@ -2188,7 +2188,7 @@ normalize_sync_check() {
 collect_provider_names() {
     local names=("default")
     local i
-    for i in 2 3 4 5 6; do
+    for i in 2 3 4 5 6 7 8 9; do
         local name_var="MODEL${i}_NAME"
         local provider_name="${!name_var}"
         if [ -n "$provider_name" ]; then
@@ -2254,7 +2254,7 @@ print_model_summary() {
     echo "当前图片模型: $final_imid"
 
     extra_providers=()
-    for i in 2 3 4 5 6; do
+    for i in 2 3 4 5 6 7 8 9; do
         api_key_var="MODEL${i}_API_KEY"
         provider_name_var="MODEL${i}_NAME"
         if [ -n "${!api_key_var}" ] || [ -n "${!provider_name_var}" ]; then
