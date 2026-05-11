@@ -71,6 +71,7 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
     brew install steipete/tap/gogcli && \
     brew install gh && \
+    brew install jq && \
     brew cleanup --prune=all
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
