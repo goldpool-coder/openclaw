@@ -1450,9 +1450,9 @@ def sync_models(ctx):
     if primary_provider:
         synced_provider_names.append(primary_provider)
 
-    # 2. 同步额外提供商 (2-6)
+    # 2. 同步额外提供商 (2-10)
     enabled_extra_providers = []
-    for index in range(2, 7):
+    for index in range(2, 11):
         prefix = f'MODEL{index}'
         raw_name = str(ctx.env.get(f'{prefix}_NAME') or '').strip()
         p_name = raw_name or f'model{index}'
