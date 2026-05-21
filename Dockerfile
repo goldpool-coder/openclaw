@@ -55,17 +55,20 @@ RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     
 USER node
 ENV HOME=/home/node \
-    PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
+    PATH="/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
 
 WORKDIR /home/node
 
 # 安装 linuxbrew
 RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     git clone --depth 1 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
+    mkdir -p /home/node/.npm-global && \
     mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
+    npm config set prefix '/home/node/.npm-global' && \
+    npm install -g @google/gemini-cli && \
     # 先 eval 初始化 Homebrew 环境 ，再执行 install
     eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
     # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
