@@ -68,7 +68,8 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
     npm config set prefix '/home/node/.npm-global' && \
-    npm install -g @google/gemini-cli && \
+    npm install -g @google/gemini-cli mcporter && \
+    pip install nano-pdf && \
     # 先 eval 初始化 Homebrew 环境 ，再执行 install
     eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
     # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
@@ -111,7 +112,7 @@ ENV HOME=/home/node \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
     NODE_ENV=production \
-    PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
+    PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
