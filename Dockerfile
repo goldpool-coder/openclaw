@@ -55,7 +55,7 @@ RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     
 USER node
 ENV HOME=/home/node \
-    PATH="/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
+    PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
 
 WORKDIR /home/node
 
@@ -73,6 +73,8 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     brew install gh && \
     brew install jq && \
     brew cleanup --prune=all
+
+ENV PATH="/home/node/.npm-global/bin:${PATH}"
 
 # 配置 npm 全局目录，安装 npm 的命令 (单独一行，避免互相干扰)
 RUN mkdir -p /home/node/.npm-global && \
