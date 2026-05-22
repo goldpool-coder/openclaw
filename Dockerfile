@@ -74,16 +74,6 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     brew install jq && \
     brew cleanup --prune=all
 
-ENV PATH="/home/node/.npm-global/bin:${PATH}"
-
-# 配置 npm 全局目录，安装 npm 的命令 (单独一行，避免互相干扰)
-RUN mkdir -p /home/node/.npm-global && \
-    npm config set prefix '/home/node/.npm-global' && \
-    npm install -g @google/gemini-cli mcporter
-
-# pip 安装
-RUN pip install nano-pdf
-
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
 ARG NAPCAT_VERSION
@@ -118,7 +108,7 @@ ENV HOME=/home/node \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
     NODE_ENV=production \
-    PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
+    PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
