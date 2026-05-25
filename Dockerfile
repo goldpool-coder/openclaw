@@ -68,9 +68,9 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew /home/node/.linuxbrew/bin && \
     brew update --force --quiet  && \
     chmod -R go-w "$(brew --prefix)/share/zsh"  && \
     # 安装工具
-    brew install steipete/tap/gogcli && \
-    brew install gh && \
-    brew install jq && \
+    # brew install steipete/tap/gogcli && \
+    # brew install gh && \
+    # brew install jq && \
     # 手动清理缓存以减小镜像体积
     brew cleanup --prune=all
 
