@@ -60,19 +60,21 @@ ENV HOME=/home/node \
 WORKDIR /home/node
 
 # 安装 linuxbrew
-RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
+RUN mkdir -p /home/node/.linuxbrew/Homebrew /home/node/.linuxbrew/bin && \
     git clone --depth 1 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
-    mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
-    chown -R node:node /home/node/.linuxbrew && \
-    chmod -R g+rwX /home/node/.linuxbrew && \
-    # 先 eval 初始化 Homebrew 环境 ，再执行 install
-    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
-    # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
+    # 先 eval 初始化 Homebrew 环境
+    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv )" && \
+    # 【关键修复】禁用自动更新，防止 Homebrew 因浅克隆报错
+    export HOMEBREW_NO_AUTO_UPDATE=1 && \
+    export HOMEBREW_NO_INSTALL_CLEANUP=1 && \
+    # 安装工具
     brew install steipete/tap/gogcli && \
     brew install gh && \
     brew install jq && \
+    # 手动清理缓存以减小镜像体积
     brew cleanup --prune=all
+
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
