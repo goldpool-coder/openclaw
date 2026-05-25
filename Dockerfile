@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.5.19
+ARG APP_VERSION=2026.5.22
 ARG NAPCAT_VERSION=v4.17.25
 
 # 基础镜像
@@ -55,25 +55,32 @@ RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     
 USER node
 ENV HOME=/home/node \
-    PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
+    PATH="/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
 
 WORKDIR /home/node
 
 # 安装 linuxbrew
-RUN mkdir -p /home/node/.linuxbrew/Homebrew /home/node/.linuxbrew/bin && \
-    git clone https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
+RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
+    git clone --depth 1 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
+    mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
-    # 先 eval 初始化 Homebrew 环境
-    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv )" && \
-    brew update --force --quiet  && \
-    chmod -R go-w "$(brew --prefix)/share/zsh"  && \
-    # 安装工具
+    chown -R node:node /home/node/.linuxbrew && \
+    chmod -R g+rwX /home/node/.linuxbrew && \
+    # 先 eval 初始化 Homebrew 环境 ，再执行 install
+    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
+    # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
     brew install openclaw/tap/gogcli && \
     brew install gh && \
     brew install jq && \
-    # 手动清理缓存以减小镜像体积
     brew cleanup --prune=all
 
+# 配置 npm 全局目录，安装 npm 的命令 (单独一行，避免互相干扰)
+RUN mkdir -p /home/node/.npm-global && \
+    npm config set prefix '/home/node/.npm-global' && \
+    npm install -g @google/gemini-cli mcporter
+
+# pip 安装
+RUN pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
@@ -109,7 +116,7 @@ ENV HOME=/home/node \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
     NODE_ENV=production \
-    PATH="/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
+    PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
