@@ -61,13 +61,12 @@ WORKDIR /home/node
 
 # 安装 linuxbrew
 RUN mkdir -p /home/node/.linuxbrew/Homebrew /home/node/.linuxbrew/bin && \
-    git clone --depth 1 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
+    git clone https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     # 先 eval 初始化 Homebrew 环境
     eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv )" && \
-    # 【关键修复】禁用自动更新，防止 Homebrew 因浅克隆报错
-    export HOMEBREW_NO_AUTO_UPDATE=1 && \
-    export HOMEBREW_NO_INSTALL_CLEANUP=1 && \
+    brew update --force --quiet  && \
+    chmod -R go-w "$(brew --prefix)/share/zsh"  && \
     # 安装工具
     brew install steipete/tap/gogcli && \
     brew install gh && \
