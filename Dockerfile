@@ -72,15 +72,13 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     brew install openclaw/tap/gogcli && \
     brew install gh && \
     brew install jq && \
-    brew cleanup --prune=all
-
-# 配置 npm 全局目录，安装 npm 的命令 (单独一行，避免互相干扰)
-RUN mkdir -p /home/node/.npm-global && \
+    brew cleanup --prune=all && \
+    # 配置 npm 全局目录，安装 npm 的命令 (单独一行，避免互相干扰)
+    mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
-    npm install -g @google/gemini-cli mcporter
-
-# pip 安装
-RUN pip install nano-pdf
+    npm install -g @google/gemini-cli mcporter && \
+    # pip 安装
+    pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
