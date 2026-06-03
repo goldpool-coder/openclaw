@@ -1,10 +1,10 @@
-# OpenClaw Docker 镜像 
+# OpenClaw Docker 镜像 (全栈开发版: Node + Python + .NET + Java)
 
 # --- 1. 定义所有构建时参数 ---
 ARG APP_VERSION=2026.5.26
 ARG NAPCAT_VERSION=v4.17.25
 
-# 基础镜像
+# 基础镜像 (基于 Debian 12 Bookworm)
 FROM node:24-slim
 
 # 从 Python 官方镜像拷贝 Python 3.12
@@ -17,14 +17,22 @@ WORKDIR /app
 ENV BUN_INSTALL="/usr/local" \
     PATH="/usr/local/bin:$PATH" \
     NODE_LLAMA_CPP_GPU=false \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 
 # --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
+# 新增: 提前安装 curl 和 ca-certificates，引入微软源安装 .NET 8，并安装 JDK 17 和 Maven
 RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl ca-certificates && \
+    curl -sSL https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -o packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
-    bash ca-certificates chromium curl docker.io build-essential ffmpeg \
+    bash chromium docker.io build-essential ffmpeg \
     fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq vim nano iputils-ping dnsutils ripgrep \
-    locales openssh-client procps socat tini unzip && \
+    locales openssh-client procps socat tini unzip \
+    dotnet-sdk-8.0 openjdk-17-jdk maven && \
     sed -i 's/^# *en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
@@ -40,7 +48,7 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
 
-# --- 3. 【只】安装 openclaw (频繁变动的应用层，用于缓存优化) ---
+# --- 3. 【只】安装 openclaw (频繁变动的应用层 ，用于缓存优化) ---
 ARG APP_VERSION
 RUN npm config set registry https://registry.npmmirror.com && \
     npm install -g openclaw@${APP_VERSION} && \
@@ -66,18 +74,14 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
-    # 先 eval 初始化 Homebrew 环境 ，再执行 install
-    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv)" && \
-    # 安装 gog, 将 brew install gogcli 改为了 brew install steipete/tap/gogcli，否则安装的可能是另一个 homebrew/core/gogcli 了
+    eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv )" && \
     brew install openclaw/tap/gogcli && \
     brew install gh && \
     brew install jq && \
     brew cleanup --prune=all && \
-    # 配置 npm 全局目录，安装 npm 的命令 (单独一行，避免互相干扰)
     mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
     npm install -g @google/gemini-cli mcporter && \
-    # pip 安装
     pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
