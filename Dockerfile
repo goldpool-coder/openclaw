@@ -1,4 +1,4 @@
-# OpenClaw Docker 镜像 
+# OpenClaw Docker 镜像 (全栈开发版 + Claude Code)
 
 # --- 1. 定义所有构建时参数 ---
 ARG APP_VERSION=2026.5.26
@@ -20,7 +20,7 @@ ENV BUN_INSTALL="/usr/local" \
     DEBIAN_FRONTEND=noninteractive \
     JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 
-# --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层 - 保持原样) ---
+# --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     bash ca-certificates chromium curl docker.io build-essential ffmpeg \
@@ -31,7 +31,8 @@ RUN apt-get update && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd @steipete/summarize && \
+    # 【修改点】：在这里加入了 @anthropic-ai/claude-code
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd @steipete/summarize @anthropic-ai/claude-code && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
@@ -42,17 +43,13 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
 
 # --- 2.5. 单独安装扩展开发环境 (Java, Maven, .NET ) ---
-# 单独分层，方便调试。如果此处失败，原有的环境缓存不会丢失。
 RUN apt-get update && \
-    # 1. 安装 Java 和 Maven (Debian 官方源通常很稳定)
     apt-get install -y --no-install-recommends openjdk-17-jdk maven wget apt-transport-https && \
-    # 2. 配置微软源并安装 .NET 8 SDK
     wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
     dpkg -i packages-microsoft-prod.deb && \
     rm packages-microsoft-prod.deb && \
     apt-get update && \
     apt-get install -y --no-install-recommends dotnet-sdk-8.0 && \
-    # 清理缓存减小体积
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
