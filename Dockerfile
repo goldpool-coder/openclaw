@@ -1,10 +1,10 @@
-# OpenClaw Docker 镜像 (全栈开发版: Node + Python + .NET + Java)
+# OpenClaw Docker 镜像 
 
 # --- 1. 定义所有构建时参数 ---
 ARG APP_VERSION=2026.5.26
 ARG NAPCAT_VERSION=v4.17.25
 
-# 基础镜像 (基于 Debian 12 Bookworm)
+# 基础镜像
 FROM node:24-slim
 
 # 从 Python 官方镜像拷贝 Python 3.12
@@ -20,19 +20,12 @@ ENV BUN_INSTALL="/usr/local" \
     DEBIAN_FRONTEND=noninteractive \
     JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
 
-# --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
-# 新增: 提前安装 curl 和 ca-certificates，引入微软源安装 .NET 8，并安装 JDK 17 和 Maven
+# --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层 - 保持原样) ---
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl ca-certificates && \
-    curl -sSL https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -o packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    apt-get update && \
     apt-get install -y --no-install-recommends \
-    bash chromium docker.io build-essential ffmpeg \
+    bash ca-certificates chromium curl docker.io build-essential ffmpeg \
     fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq vim nano iputils-ping dnsutils ripgrep \
-    locales openssh-client procps socat tini unzip \
-    dotnet-sdk-8.0 openjdk-17-jdk maven && \
+    locales openssh-client procps socat tini unzip && \
     sed -i 's/^# *en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
@@ -47,6 +40,21 @@ RUN apt-get update && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
+
+# --- 2.5. 单独安装扩展开发环境 (Java, Maven, .NET ) ---
+# 单独分层，方便调试。如果此处失败，原有的环境缓存不会丢失。
+RUN apt-get update && \
+    # 1. 安装 Java 和 Maven (Debian 官方源通常很稳定)
+    apt-get install -y --no-install-recommends openjdk-17-jdk maven wget apt-transport-https && \
+    # 2. 配置微软源并安装 .NET 8 SDK
+    wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends dotnet-sdk-8.0 && \
+    # 清理缓存减小体积
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # --- 3. 【只】安装 openclaw (频繁变动的应用层 ，用于缓存优化) ---
 ARG APP_VERSION
