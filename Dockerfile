@@ -2,7 +2,6 @@
 
 # --- 1. 定义所有构建时参数 ---
 ARG APP_VERSION=2026.6.1
-ARG NAPCAT_VERSION=v4.17.25
 
 # 基础镜像
 FROM node:24-slim
@@ -94,11 +93,6 @@ ARG APP_VERSION
 ARG NAPCAT_VERSION
 ARG CLAWHUB_TOKEN
 RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi && \
-  cd /home/node/.openclaw/extensions && \
-  git clone --depth 1 -b "${NAPCAT_VERSION}" https://github.com/Daiyimo/openclaw-napcat.git napcat && \
-  cd napcat && \
-  npm install --production && \
-  timeout 300 openclaw plugins install --dangerously-force-unsafe-install -l . || true && \
   cd /home/node/.openclaw/extensions && \
   timeout 300 openclaw plugins install --dangerously-force-unsafe-install @soimy/dingtalk || true && \
   timeout 300 openclaw plugins install --dangerously-force-unsafe-install @tencent-connect/openclaw-qqbot@latest || true && \
