@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 (全栈开发版 + Claude Code)
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.6.5
+ARG APP_VERSION=2026.6.8
 
 # 基础镜像
 FROM node:24-slim
@@ -118,13 +118,7 @@ ENV HOME=/home/node \
     LC_ALL=en_US.UTF-8 \
     NODE_ENV=production \
     PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
-    AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium \
-    NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
-    OPENCLAW_NO_RESPAWN=1 \
-    QMD_LLAMA_GPU=false \
-    NODE_LLAMA_CPP_GPU=false \
-    HOMEBREW_NO_AUTO_UPDATE=1 \
-    HOMEBREW_NO_INSTALL_CLEANUP=1
+    AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium 
 
 # 暴露端口
 EXPOSE 18789
