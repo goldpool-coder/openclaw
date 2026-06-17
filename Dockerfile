@@ -118,7 +118,7 @@ ENV HOME=/home/node \
     LC_ALL=en_US.UTF-8 \
     NODE_ENV=production \
     PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
-    AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium 
+    AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium
 
 # 暴露端口
 EXPOSE 18789
