@@ -73,16 +73,12 @@ WORKDIR /home/node
 
 # 安装 linuxbrew
 RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
-    git clone --depth 1 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
+    git clone --depth 1 5.1.15 -b https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
     eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv )" && \
-    # Docker 容器本来就在一个隔离的 Docker 容器里了，Homebrew 的沙盒机制其实是多余的。所以通过设置环境变量 HOMEBREW_NO_SANDBOX=1 来强制关闭它。
-    export HOMEBREW_NO_SANDBOX=1 && \
-    # Homebrew 6.0 还引入了另一个破坏性更新：Tap Trust（第三方仓库信任机制）。出于安全考虑，现在安装非官方的第三方 Tap 之前，必须先显式声明信任。
-    brew trust openclaw/tap && \
     brew install openclaw/tap/gogcli && \
     brew install gh && \
     brew install jq && \
