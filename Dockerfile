@@ -73,7 +73,7 @@ WORKDIR /home/node
 
 # 安装 linuxbrew
 RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
-    git clone --depth 1 5.1.15 -b https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
+    git clone --depth 1 -b 5.1.15 https://github.com/Homebrew/brew /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.linuxbrew/bin && \
     ln -s /home/node/.linuxbrew/Homebrew/bin/brew /home/node/.linuxbrew/bin/brew && \
     chown -R node:node /home/node/.linuxbrew && \
