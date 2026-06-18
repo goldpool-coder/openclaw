@@ -82,7 +82,7 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     # brew install openclaw/tap/gogcli && \
     brew install gh && \
     brew install jq && \
-    brew cleanup --prune=all # && \
+    brew cleanup --prune=all && \
     mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
     npm install -g @google/gemini-cli mcporter && \
