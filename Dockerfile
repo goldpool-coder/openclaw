@@ -110,6 +110,9 @@ COPY ./init.sh /usr/local/bin/init.sh
 RUN sed -i 's/\r$//' /usr/local/bin/init.sh && \
     chmod +x /usr/local/bin/init.sh
 
+# --- 6. 镜环境变量注入到启动的终端中 ---
+RUN echo '. /home/node/.openclaw/.env' >> /home/node/.bashrc
+
 # 设置最终的环境变量
 ENV HOME=/home/node \
     TERM=xterm-256color \
