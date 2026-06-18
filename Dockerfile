@@ -86,8 +86,7 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
     npm install -g @google/gemini-cli mcporter && \
-    pip install nano-pdf && \
-    ls
+    pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
 ARG APP_VERSION
