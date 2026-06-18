@@ -79,6 +79,7 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     chown -R node:node /home/node/.linuxbrew && \
     chmod -R g+rwX /home/node/.linuxbrew && \
     eval "$(/home/node/.linuxbrew/Homebrew/bin/brew shellenv )" && \
+    export HOMEBREW_NO_AUTO_UPDATE=1 && \
     brew install openclaw/tap/gogcli && \
     brew install gh && \
     brew install jq && \
