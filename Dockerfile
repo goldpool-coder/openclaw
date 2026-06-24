@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 (全栈开发版 + Claude Code)
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.6.8
+ARG APP_VERSION=2026.6.9
 
 # 基础镜像
 FROM node:24-slim
@@ -87,6 +87,7 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
     npm install -g @google/gemini-cli mcporter && \
+    npx -y @dingtalk-real-ai/dingtalk-connector install  && \
     pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
@@ -102,7 +103,8 @@ RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi 
   find /home/node/.openclaw/extensions -name ".git" -type d -exec rm -rf {} + && \
   mv /home/node/.openclaw/extensions /home/node/.openclaw-seed/ && \
   printf '%s\n' "${APP_VERSION}" > /home/node/.openclaw-seed/extensions/.seed-version && \
-  rm -rf /tmp/* /home/node/.npm /home/node/.cache
+  rm -rf /tmp/* /home/node/.npm /home/node/.cache  && \
+  mkdir -p /var/tmp/openclaw-compile-cache
   
 # --- 5. 最终配置 ---
 USER root
@@ -121,6 +123,8 @@ ENV HOME=/home/node \
     LANGUAGE=en_US:en \
     LC_ALL=en_US.UTF-8 \
     NODE_ENV=production \
+    NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
+    OPENCLAW_NO_RESPAWN=1 \
     PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium
 
