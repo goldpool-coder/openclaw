@@ -87,7 +87,6 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
     npm install -g @google/gemini-cli mcporter && \
-    npx -y @dingtalk-real-ai/dingtalk-connector install  && \
     pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
@@ -96,7 +95,7 @@ ARG NAPCAT_VERSION
 ARG CLAWHUB_TOKEN
 RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi && \
   cd /home/node/.openclaw/extensions && \
-  timeout 300 openclaw plugins install --dangerously-force-unsafe-install @soimy/dingtalk || true && \
+  timeout 300 openclaw plugins install --dangerously-force-unsafe-install @dingtalk-real-ai/dingtalk-connector || true && \
   timeout 300 openclaw plugins install --dangerously-force-unsafe-install @tencent-connect/openclaw-qqbot@latest || true && \
   timeout 300 openclaw plugins install --dangerously-force-unsafe-install @sunnoy/wecom || true && \
   mkdir -p /home/node/.openclaw /home/node/.openclaw-seed && \
