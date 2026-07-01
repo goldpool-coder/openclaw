@@ -1,7 +1,7 @@
-# OpenClaw Docker 镜像 (全栈开发版 + Claude Code)
+# OpenClaw Docker 镜像 (全栈开发版 + Claude Code + 多智能体团队依赖)
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.6.9
+ARG APP_VERSION=2026.6.11
 
 # 基础镜像
 FROM node:24-slim
@@ -24,18 +24,22 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     bash ca-certificates chromium curl docker.io build-essential ffmpeg \
     fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq vim nano iputils-ping dnsutils ripgrep \
+    libxml2-dev libxslt-dev \
     locales openssh-client procps socat tini unzip && \
     sed -i 's/^# *en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    # 【修改点】：在这里加入了 @anthropic-ai/claude-code
     npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd @steipete/summarize @anthropic-ai/claude-code && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
     /usr/local/bin/python3 -m pip install --no-cache-dir websockify && \
+    /usr/local/bin/python3 -m pip install --no-cache-dir \
+        beautifulsoup4 feedparser jinja2 jsonschema lxml matplotlib numpy \
+        openpyxl pandas python-docx python-Levenshtein python-pptx requests \
+        scikit-learn scipy statsmodels && \
     npx playwright install chromium --with-deps && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
@@ -64,7 +68,7 @@ RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     chown -R node:node /usr/local/lib/node_modules /home/node/.cache/qmd && \
     chown -R node:node /home/node /var/tmp/openclaw-compile-cache /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 && \
     chmod 700 /tmp/openclaw-1000
-    
+
 USER node
 ENV HOME=/home/node \
     PATH="/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/Homebrew/bin:${PATH}"
@@ -104,15 +108,12 @@ RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi 
   printf '%s\n' "${APP_VERSION}" > /home/node/.openclaw-seed/extensions/.seed-version && \
   rm -rf /tmp/* /home/node/.npm /home/node/.cache  && \
   mkdir -p /var/tmp/openclaw-compile-cache
-  
+
 # --- 5. 最终配置 ---
 USER root
 COPY ./init.sh /usr/local/bin/init.sh
 RUN sed -i 's/\r$//' /usr/local/bin/init.sh && \
     chmod +x /usr/local/bin/init.sh
-
-# --- 6. 镜环境变量注入到启动的终端中 ---
-RUN echo '. /home/node/.openclaw/.env' >> /home/node/.bashrc
 
 # 设置最终的环境变量
 ENV HOME=/home/node \
@@ -124,6 +125,7 @@ ENV HOME=/home/node \
     NODE_ENV=production \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
+    MPLBACKEND=Agg \
     PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium
 
