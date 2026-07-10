@@ -22,16 +22,17 @@ ENV BUN_INSTALL="/usr/local" \
 # --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    bash ca-certificates chromium curl docker.io build-essential ffmpeg \
+    bash ca-certificates chromium curl docker.io docker-compose-plugin build-essential ffmpeg \
     fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq vim nano iputils-ping dnsutils ripgrep \
     libxml2-dev libxslt-dev libxml2 libxslt1.1 \
+    sqlite3 mariadb-client postgresql-client \
     locales openssh-client procps socat tini unzip && \
     sed -i 's/^# *en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
     printf 'LANG=en_US.UTF-8\nLANGUAGE=en_US:en\nLC_ALL=en_US.UTF-8\n' > /etc/default/locale && \
     git config --system url."https://github.com/".insteadOf ssh://git@github.com/ && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd @steipete/summarize @anthropic-ai/claude-code mcp-trends-hub && \
+    npm install -g opencode-ai@latest clawhub playwright playwright-extra puppeteer-extra-plugin-stealth @steipete/bird @larksuiteoapi/node-sdk @tobilu/qmd @steipete/summarize @anthropic-ai/claude-code mcp-trends-hub markdownlint-cli && \
     curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash && \
     curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh && \
     ln -sf /usr/local/bin/python3 /usr/local/bin/python && \
@@ -67,7 +68,8 @@ RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
     mkdir -p /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 /home/node/.cache/qmd && \
     chown -R node:node /usr/local/lib/node_modules /home/node/.cache/qmd && \
     chown -R node:node /home/node /var/tmp/openclaw-compile-cache /var/tmp/openclaw-compile-cache /tmp/openclaw-1000 && \
-    chmod 700 /tmp/openclaw-1000
+    chmod 700 /tmp/openclaw-1000 && \
+    groupadd -f docker && usermod -aG docker node
 
 USER node
 ENV HOME=/home/node \
