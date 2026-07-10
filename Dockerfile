@@ -22,7 +22,7 @@ ENV BUN_INSTALL="/usr/local" \
 # --- 2. 安装【除 openclaw 外】的所有系统依赖和全局工具 (稳定的基础层) ---
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    bash ca-certificates chromium curl docker.io docker-compose-plugin build-essential ffmpeg \
+    bash ca-certificates chromium curl docker.io docker-compose build-essential ffmpeg \
     fonts-liberation fonts-noto-cjk fonts-noto-color-emoji git gosu jq vim nano iputils-ping dnsutils ripgrep \
     libxml2-dev libxslt-dev libxml2 libxslt1.1 \
     sqlite3 mariadb-client postgresql-client \
