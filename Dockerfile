@@ -1,7 +1,7 @@
 # OpenClaw Docker 镜像 (全栈开发版 + Claude Code + 多智能体团队依赖)
 
 # --- 1. 定义所有构建时参数 ---
-ARG APP_VERSION=2026.6.11
+ARG APP_VERSION=2026.7.1
 
 # 基础镜像
 FROM node:24-slim
