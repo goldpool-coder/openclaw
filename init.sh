@@ -2476,8 +2476,14 @@ main() {
     print_runtime_summary
     setup_runtime_env
     install_signal_traps
-    start_gateway
-    wait_for_gateway
+    
+    # 改成重启循环 ↓
+    while true; do
+        start_gateway
+        wait "$GATEWAY_PID"
+        echo "⚠️ Gateway 退出 (码: $?) ，5秒后自动重启..."
+        sleep 5
+    done
 }
 
 main
