@@ -60,8 +60,7 @@ RUN apt-get update && \
 ARG APP_VERSION
 RUN npm config set registry https://registry.npmmirror.com && \
     npm install -g openclaw@${APP_VERSION} && \
-    rm -rf /tmp/* /root/.npm /root/.cache && \
-    npx playwright install chromium --with-deps
+    rm -rf /tmp/* /root/.npm /root/.cache
 
 # --- 4. 准备 node 用户环境并安装插件 ---
 RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
@@ -108,7 +107,8 @@ RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi 
   find /home/node/.openclaw/extensions -name ".git" -type d -exec rm -rf {} + && \
   mv /home/node/.openclaw/extensions /home/node/.openclaw-seed/ && \
   printf '%s\n' "${APP_VERSION}" > /home/node/.openclaw-seed/extensions/.seed-version && \
-  rm -rf /tmp/* /home/node/.npm /home/node/.cache  && \
+  rm -rf /tmp/* /home/node/.npm /home/node/.cache  && \   
+  npx playwright install chromium --with-deps && \
   mkdir -p /var/tmp/openclaw-compile-cache
 
 # --- 5. 最终配置 ---
