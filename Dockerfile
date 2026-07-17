@@ -107,9 +107,11 @@ RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi 
   find /home/node/.openclaw/extensions -name ".git" -type d -exec rm -rf {} + && \
   mv /home/node/.openclaw/extensions /home/node/.openclaw-seed/ && \
   printf '%s\n' "${APP_VERSION}" > /home/node/.openclaw-seed/extensions/.seed-version && \
-  rm -rf /tmp/* /home/node/.npm /home/node/.cache  && \   
-  npx playwright install chromium --with-deps && \
+  rm -rf /tmp/* /home/node/.npm /home/node/.cache && \
+  PLAYWRIGHT_BROWSERS_PATH=/home/node/.playwright-browsers && \
+  /usr/local/bin/python3 -m playwright install chromium --with-deps && \
   mkdir -p /var/tmp/openclaw-compile-cache
+
 
 # --- 5. 最终配置 ---
 USER root
@@ -128,6 +130,7 @@ ENV HOME=/home/node \
     NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache \
     OPENCLAW_NO_RESPAWN=1 \
     MPLBACKEND=Agg \
+    PLAYWRIGHT_BROWSERS_PATH=/home/node/.playwright-browsers \
     PATH="/home/node/.local/bin:/home/node/.npm-global/bin:/home/node/.linuxbrew/bin:/home/node/.linuxbrew/sbin:/usr/local/lib/node_modules/.bin:${PATH}" \
     AGENT_BROWSER_CHROME_PATH=/usr/bin/chromium
 
