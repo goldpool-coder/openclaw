@@ -108,8 +108,7 @@ RUN if [ -n "$CLAWHUB_TOKEN" ]; then clawhub login --token "$CLAWHUB_TOKEN"; fi 
   mv /home/node/.openclaw/extensions /home/node/.openclaw-seed/ && \
   printf '%s\n' "${APP_VERSION}" > /home/node/.openclaw-seed/extensions/.seed-version && \
   rm -rf /tmp/* /home/node/.npm /home/node/.cache && \
-  PLAYWRIGHT_BROWSERS_PATH=/home/node/.playwright-browsers && \
-  /usr/local/bin/python3 -m playwright install chromium && \
+  PLAYWRIGHT_BROWSERS_PATH=/home/node/.playwright-browsers /usr/local/bin/python3 -m playwright install chromium && \
   mkdir -p /var/tmp/openclaw-compile-cache
 
 
