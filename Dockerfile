@@ -40,8 +40,7 @@ RUN apt-get update && \
     /usr/local/bin/python3 -m pip install --no-cache-dir \
         beautifulsoup4 feedparser jinja2 jsonschema lxml matplotlib numpy \
         openpyxl pandas python-docx python-Levenshtein python-pptx requests \
-        scikit-learn scipy statsmodels && \
-    npx playwright install chromium --with-deps && \
+        scikit-learn scipy statsmodels playwright && \
     apt-get purge -y --auto-remove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /root/.npm /root/.cache
@@ -61,7 +60,8 @@ RUN apt-get update && \
 ARG APP_VERSION
 RUN npm config set registry https://registry.npmmirror.com && \
     npm install -g openclaw@${APP_VERSION} && \
-    rm -rf /tmp/* /root/.npm /root/.cache
+    rm -rf /tmp/* /root/.npm /root/.cache && \
+    npx playwright install chromium --with-deps
 
 # --- 4. 准备 node 用户环境并安装插件 ---
 RUN mkdir -p /home/node/.openclaw/workspace /home/node/.openclaw/extensions && \
