@@ -91,7 +91,7 @@ RUN mkdir -p /home/node/.linuxbrew/Homebrew && \
     brew cleanup --prune=all && \
     mkdir -p /home/node/.npm-global && \
     npm config set prefix '/home/node/.npm-global' && \
-    npm install -g @google/gemini-cli mcporter && \
+    npm install -g @google/gemini-cli mcporter markdown-it juice && \
     pip install nano-pdf
 
 # 再次声明 ARG ，以便在 node 用户的 RUN 指令中使用
